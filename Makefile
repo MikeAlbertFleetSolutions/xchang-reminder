@@ -18,13 +18,8 @@ build:
 	rm -f target/$(package)
 	GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -v -o target/$(package)
 
-release:
-	mkdir -p target
-	rm -f target/*
-	GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -v -o target/$(package)
-	zip -j -u target/$(package)_linux_amd64.zip target/$(package)
-	rm -f target/$(package)
-	ghr -c ${CIRCLE_SHA1} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} --replace "v${CIRCLE_BUILD_NUM}" target/
+install: build
+	cp target/$(package) ~/bin/$(package)
 
 test:
 	go test -v
