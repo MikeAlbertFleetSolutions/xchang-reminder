@@ -21,6 +21,7 @@ type configuration struct {
 	MaxFetchSize int
 	ExchangeURL  string
 	Reminder     int
+	Icon         string
 }
 
 var (
@@ -94,12 +95,18 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
+	// determine icon to use for notify message
+	icon := config.Icon
+	if _, err = os.Stat(config.Icon); os.IsNotExist(err) {
+		icon = ""
+	}
+
 	// notify of events within the reminder period
 	start := time.Now()
 	end := start.Add(time.Minute * time.Duration(config.Reminder))
 	for _, appointment := range appointments {
 		if inTimeSpan(start, end, appointment.Start.In(time.Local)) {
-			err := beeep.Alert("Event", appointment.Subject, "")
+			err := beeep.Alert("Calendar Event", fmt.Sprintf("<b>%s</b>", appointment.Subject), icon)
 			if err != nil {
 				log.Fatalf("%+v", err)
 			}
